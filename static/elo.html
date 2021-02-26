@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Embedding Vega-Lite</title>
+  <!-- fetch polyfill https://github.com/github/fetch -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js"></script>
+  <!-- Vega -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vega/3.0.8/vega.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vega-lite/2.0.3/vega-lite.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vega-embed/3.0.0-rc7/vega-embed.min.js"></script>
+  <!-- Vega Tooltip -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vega-tooltip/0.4.4/vega-tooltip.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/vega-tooltip/0.4.4/vega-tooltip.min.css">
+</head>
+<body>
+
+  <div id="vis"></div>
+
+  <script type="text/javascript">
+  // Get the data for the graph and for computing the max values
+  fetch("/data/elograph.json")
+  .then(response => response.json())
+  .then(values => {
+    // Share the axis variables for use in multiple layers
+    var x = {
+      "axis": { "title": "Number of accumulated games" },
+      "field": "net",
+      "type": "quantitative"
+    };
+    var y = {
+      "axis": { "title": "Elo rating (0 = random play)" },
+      "field": "rating",
+      "type": "quantitative"
+    };
+
+    // Customize the default axis if there's a desired recent view
+    var recent = location.hash.match(/recent=(\d+)/);
+    if (recent) {
+      recent = Number(recent[1]);
+
+      // Find the highest number of games of valid networks
+      var networks = values.filter(v => v.net && v.rating);
+      var maxGames = Math.max(...networks.map(v => v.net));
+
+      // Find networks that are in the recent window
+      var threshold = maxGames - recent;
+      var recentNetworks = networks.filter(v => v.net >= threshold);
+
+      // Find the other bounds for games and rating of recent networks
+      var minGames = Math.min(...recentNetworks.map(v => v.net));
+      var minRating = Math.min(...recentNetworks.map(v => v.rating));
+      var maxRating = Math.max(...recentNetworks.map(v => v.rating));
+      // var maxRating = maxGames * 0.025;
+
+      // Set the domain bounds of each axis
+      x.scale = { "domain": [minGames, maxGames] };
+      y.scale = { "domain": [minRating, maxRating] };
+    }
+
+    // Configure the vega-lite graph for a strength line and network "dots"
+    var vlSpec = {
+      "$schema": "https://vega.github.io/schema/vega-lite/v2.0.json",
+      "description": "Leela Zero Elo rating",
+      "config": { 
+        "point": { "size": 80 }
+      }, 
+      "data": { "values": values },
+      "layer": [
+        {
+          "transform": [
+            { "filter": { "field": "best", "equal": "true" } }
+          ],
+          "selection": {
+            "grid": {
+              "type": "interval",
+              "bind": "scales"
+            }
+          },
+          "mark": {
+            "type": "line",
+            "interpolate": "monotone"
+          },
+          "encoding": {
+            "x": x,
+            "y": y,
+            "color": {
+              "value": "blue"
+            }
+          }
+        },
+        {
+          "transform": [
+            { "filter": "datum.rating > -1 && !(datum.rating < 1 && datum.net > 1) && !(datum.rating > 1 && datum.net < 1)" }
+          ],
+          "mark": {"type": "point", "filled": true},
+          "encoding": {
+            "x": x,
+            "y": y,
+            "color": {
+              "field": "sprt", "type": "nominal",
+              "scale": {"range": ["#59E817", "rgba(193,27,23,0.3)", "blue", "rgba(0,0,0,0.5)"]}
+            },
+            "shape": {
+              "field": "sprt", "type": "nominal",
+              "scale": {"range": ["circle", "triangle-down", "circle", "cross"]}
+            }
+          }
+        } 
+      ]
+    }
+
+    var opt = {
+      mode: "vega-lite",
+      actions: false,
+      width: 800,
+      height: 600
+    };
+
+    var tooltipOpt = {
+      showAllFields: false,
+      fields: [
+        {field: "net", title: "Number of trained games", format: ",d"},
+        {field: "rating", title: "Elo rating (0 = random play)"},
+        {field: "sprt", title: "SPRT"},
+        {field: "hash", title: "Hash"}
+      ]
+    };
+
+    // Render the graph then add tooltips
+    vegaEmbed("#vis", vlSpec, opt)
+    .then(result => vegaTooltip.vegaLite(result.view, vlSpec, tooltipOpt))
+    .catch(console.error);
+  })
+  .catch(console.error);
+  </script>
+  </div>
+</body>
+</html>
+

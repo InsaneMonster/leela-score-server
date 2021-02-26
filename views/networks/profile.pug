@@ -1,0 +1,54 @@
+extends ../layout.pug
+
+block meta
+    - var title = network.hash.slice(0, 8)
+    - var identicon = `${http_host}/static/networks/${network.hash}.png`
+    meta(property="og:title" content=`${title}`)
+    meta(property="og:type" content="website")
+    meta(property="og:url" content=`${http_host}/network-profiles/${network.hash}`)
+    meta(property="og:image" content=`${identicon}`)
+
+block script
+    script(src="/static/timeago.js")
+    script.
+        var app = new Vue({
+            el: 'main',
+            data: {
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                matches: !{ JSON.stringify(matches) },
+            }
+        })
+
+block content
+    v-container(grid-list-md text-xs-center)
+        v-layout(row wrap)
+            v-flex(xs3)
+                v-card
+                    v-card-media(src=`${identicon}` height="200")
+                    v-card-text
+                        h2.text-center
+                            if(network.networkID != null)
+                                div.green LZ#{network.networkID}
+                            b #{title} 
+                        a.btn.btn-light.btn-block.border-dark(href=`${http_host}/networks/${network.hash}.gz`) Download
+                        v-list(two-line)
+                            v-list-tile
+                                v-list-tile-content
+                                    v-list-tile-sub-title Architecture
+                                    v-list-tile-title.text-xs-right #{network.blocks}x#{network.filters}
+                            v-list-tile
+                                v-list-tile-content
+                                    v-list-tile-sub-title Training
+                                    v-list-tile-title.text-xs-right #{network.training_count.abbr(4)} #{network.training_steps ? "+" + network.training_steps.abbr(3) : ""}
+                            v-list-tile
+                                v-list-tile-content
+                                    v-list-tile-sub-title Since
+                                    v-list-tile-title.text-xs-right #{network._id.getTimestamp().toLocaleDateString()} #{network._id.getTimestamp().toLocaleTimeString()}
+                            v-list-tile #{network.description}
+            
+            v-flex(xs9)
+                v-tabs
+                    v-tab(href=`/network-profiles/${network.hash}/matches`) Match Games
+                div.ml-3(class="text-xs-left") (*) Times are displayed in {{ timezone }} time zone
+                include ../common/match-table.pug
+

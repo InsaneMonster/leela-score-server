@@ -1,0 +1,42 @@
+doctype html
+html(lang="en")
+    head
+        script(src="/static/tablesort/tablesort.js")
+        script(src="/static/tablesort/tablesort.number.js")
+        link(href="/static/tablesort/tablesort.css" rel="stylesheet")
+    body
+        table(id="sort" border="1")
+            thead
+                tr
+                    th Self-Play Hash
+                    th Network
+                    th Winner
+                    th Move Count
+                    th Started
+                    th Duration
+                    th Download
+                    th Client
+                    th Version
+                    th Computer
+            tbody
+                each item in data
+                    tr
+                        td
+                            a(href="/view/" + item.sgfhash + "?viewer=wgo")  #{item.sgfhash.slice(0, 32)}
+                        td #{item.networkhash.slice(0, 8)}
+                        td #{item.winnercolor}
+                        td #{item.movescount}
+                        td #{item.started} minutes ago
+                        td #{item.duration} minutes
+                        td
+                            a(href="/view/" + item.sgfhash + ".sgf")  sgf
+                        td #{item.ip}
+                        td #{item.clientversion}
+                        td #{item.username}
+        script.
+            Tablesort.extend('minutes', item => /minutes/.test(item), (a, b) => {
+                a = (a.match(/([.\d]+) minutes/) || [])[1] || 0;
+                b = (b.match(/([.\d]+) minutes/) || [])[1] || 0;
+                return b - a;
+            });
+            new Tablesort(document.getElementById('sort'));

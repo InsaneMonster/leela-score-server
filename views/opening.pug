@@ -1,0 +1,64 @@
+extends layout.pug
+
+block script
+    script(src="/static/wgo/wgo.min.js")
+    script(src="/static/wgo/wgo.player.min.js")
+    link(rel="stylesheet" href="/static/wgo/wgo.player.css")
+    script(src="https://www.gstatic.com/charts/loader.js")
+    script.
+        var app = new Vue({
+            el: 'main',
+            data: {
+                top10: !{ JSON.stringify(top10) },
+                start: !{ JSON.stringify(start) },
+                tabs: ["44", "43", "33"],
+            },
+            mounted() {
+                google.charts.load('current', {'packages':['corechart']});
+                google.charts.setOnLoadCallback(this.drawChart);
+            },
+            methods: {
+                drawChart() {
+                    this.$refs.chartNodes.forEach((node, index) => {
+                        var data = new google.visualization.DataTable();
+                        data.addColumn('number', 'Network by Training #'); // Implicit domain label col.
+                        data.addColumn('number', 'Frequency'); // Implicit series 1 data col.
+                        data.addColumn({type: 'string', role: 'tooltip', 'p' : { html : true }});
+                        data.addRows(this.top10[index].chart);
+
+                        var options = {
+                            title: `Seen total ${this.top10[index].count} times`,
+                            hAxis: {title: 'Networks by Training #', viewWindow: { min: 0, max: 8265319} },
+                            vAxis: {title: 'Frequency'},
+                            tooltip: {isHtml: true},
+                            legend: { position : 'none'},
+                        }
+
+                        var chart = new google.visualization.ScatterChart(node);
+
+                        chart.draw(data, options);
+                    });
+                },
+            }
+        })
+
+
+block content
+    v-container(grid-list-md text-xs-left)
+        v-layout(row)
+            v-flex(xs12)
+                h1 Leela Zero Joseki Analysis
+                p Total 440,664 match games as of 2018-Jul-26
+
+                v-tabs(v-model="start")
+                    v-tab(v-for="tab in tabs" :href="`/opening/${tab}`" :key="tab") {{ `${tab[0]}-${tab[1]} Point` }}
+
+        v-layout(v-for="opening in top10" row)
+            v-flex(xs6)
+                v-card
+                    v-card-text
+                        h1 Joseki {{ opening._id.slice(0,6) }}
+                        .player(:data-wgo="opening.sgf" data-wgo-move="20" data-wgo-enablewheel="false")
+            v-flex(xs6)
+                .chart.w-100(ref="chartNodes" style="height: 100%;min-height:300px")
+

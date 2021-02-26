@@ -1,0 +1,45 @@
+extends ../layout.pug
+
+block meta
+    meta(property="og:title" content=`Leela Zero / SAI Best Networks`)
+    meta(property="og:type" content="website")
+    meta(property="og:url" content=`${http_host}/network-profiles`)
+
+block script
+    script(src="/static/timeago.js")
+    script.
+        var app = new Vue({
+            el: 'main',
+            data: {
+                networks: !{ JSON.stringify(networks) },
+            },
+        })
+
+block content
+    v-container(grid-list-md text-xs-center)
+        v-card
+            h1 Best Networks
+            
+            v-card-text
+                v-data-table(:items="networks" item-key="_id" hide-actions)
+                    template(slot="headers"  slot-scope="props")
+                        tr
+                            th #
+                            th Upload Date
+                            th Hash
+                            th Architecture
+                            th Self Play Games
+                            th Training
+                            th Download
+                    template(slot="items"  slot-scope="props")
+                        tr
+                            td LZ{{ networks.length - props.index - 1 }}
+                            td {{ props.item.time | timeAgo }}
+                            td
+                                a(:href="`/network-profiles/${props.item.hash}`") {{ props.item.hash.slice(0, 8) }}
+                            td {{ props.item.blocks }} x {{ props.item.filters }}
+                            td {{ props.item.game_count.toLocaleString() }}
+                            td {{ props.item.training_count | abbr(4) }}
+                                span(v-if="props.item.training_steps") +{{ props.item.training_steps | abbr(3)}}
+                            td
+                                a(:href="`/networks/${props.item.hash}.gz`") Download

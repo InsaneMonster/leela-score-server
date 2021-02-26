@@ -1,0 +1,15 @@
+node_modules
+auth_key
+public_auth_key
+task_secret
+network
+static/rss.xml
+static/networks/
+static/elostat.json
+logs/*
+network
+npm-debug.log
+config.ini
+configsai.js
+*~
+rem/*

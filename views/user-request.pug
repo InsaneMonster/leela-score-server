@@ -1,0 +1,33 @@
+doctype html
+html(lang="en")
+    body
+        h1 Request new user
+        p
+          | Please provide the computername and password you want to use for submitting self-plays and matches to SAI.
+          | You also need to provide a valid email address, which will receive a confirm token for enabling the account.
+          | We suggest to create different accounts for different computers. The same email address may be used for
+          | multiple accounts.
+
+        p
+          | Please note that the computername is exposed in a number of public SAI web pages. Moreover, we do not use HTTPS
+          | at the moment, hence password travels in cleartext on the web.
+
+        p
+          | <b>DO NOT REUSE THIS PASSWORD FOR ANY OTHER SERVICE.</b>
+
+
+        form(action="", method="post")
+            p
+            label(for="username") Computername: &nbsp;
+            input#username(type="text", name="username")
+            p
+            label(for="email") Email: &nbsp;
+            input#email(type="email", name="email")
+            p
+            label(for="password") Password: &nbsp;
+            input#password(type="password", name="password")
+            span &emsp;
+            label(for="password2") Confirm Password: &nbsp;
+            input#password2(type="password", name="password2")
+            p
+            button(type="submit") Create User
