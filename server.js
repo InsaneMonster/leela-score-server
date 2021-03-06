@@ -1654,8 +1654,8 @@ app.get("/", asyncMiddleware(async(req, res) => {
         let page = "<html><head>\n<title>Leela Score</title>\n";
         page += "<script type=\"text/javascript\" src=\"/static/timeago.js\"></script>\n";
         page += "<style>";
-        page += "table.networks-table { float: left; margin-right: 40px; margin-bottom: 20px; }\n";
-        page += "table.leaderboard-all-table { float: left; margin-right: 40px; margin-bottom: 20px; }\n";
+        //page += "table.networks-table { float: left; margin-right: 40px; margin-bottom: 20px; }\n";
+        //page += "table.leaderboard-all-table { float: left; margin-right: 40px; margin-bottom: 20px; }\n";
         page += styles;
 
         // From https://www.w3schools.com/css/css_tooltip.asp
@@ -1702,13 +1702,13 @@ app.get("/", asyncMiddleware(async(req, res) => {
             }
         });
 
-        page += "<p>View the <a href=\"leaderboard\">full leaderboard</a> of the contributors.</p>"
-        page += leaderboard_all_table;
-        page += leaderboard_recent_table;
+        //page += "<p>View the <a href=\"leaderboard\">full leaderboard</a> of the contributors.</p>"
+        //page += leaderboard_all_table;
+        //page += leaderboard_recent_table;
 
         page += "<h4>Recent Strength Graph (<a href=\"/static/newelo.html\">Full view</a>.)</h4>";
         page += "The plot shows a proper Bayes-Elo rating, computed on the set of all played matches.<br>";
-        page += "<h4>The x-axis scale is 1/" + LZGRAPHSCALE + " for Leela Zero networks (grey crosses).</h4><br>";
+        page += "<h4>The x-axis scale is 1/" + LZGRAPHSCALE + " for Leela Score networks (grey crosses).</h4><br>";
         page += "<iframe width=\"1100\" height=\"655\" seamless frameborder=\"0\" scrolling=\"no\" src=\"/static/newelo.html?0#recent=" + GRAPHRECENT + "\"></iframe><script>(i => i.contentWindow.location = i.src)(document.querySelector(\"iframe\"))</script>";
         page += "<br><br>Times are in GMT+0100 (CET)<br>\n";
         page += network_table;
