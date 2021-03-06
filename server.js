@@ -1654,7 +1654,7 @@ app.get("/", asyncMiddleware(async(req, res) => {
         let page = "<html><head>\n<title>Leela Score</title>\n";
         page += "<script type=\"text/javascript\" src=\"/static/timeago.js\"></script>\n";
         page += "<style>";
-        //page += "table.networks-table { float: left; margin-right: 40px; margin-bottom: 20px; }\n";
+        page += "table.networks-table { float: left; margin-right: 40px; margin-bottom: 20px; }\n";
         //page += "table.leaderboard-all-table { float: left; margin-right: 40px; margin-bottom: 20px; }\n";
         page += styles;
 
