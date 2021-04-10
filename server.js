@@ -1978,10 +1978,8 @@ app.post('/request-selfplay',  asyncMiddleware( async (req, res, next) => {
     }
 
     await db.collection("self_plays").insertOne(set);
-    if ( set.networkhash == best_network_hash ) {
-        set.requests = [];
-        pending_selfplays.unshift(set);
-    }
+    set.requests = [];
+    pending_selfplays.unshift(set);
 
     console.log(req.ip + " (" + req.headers['x-real-ip'] + ") " + " uploaded self-play");
     res.send("Self-play request for game " + set.sgfhash + " network "  + set.networkhash + " stored in database.\n");
